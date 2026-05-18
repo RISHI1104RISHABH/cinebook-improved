@@ -1,0 +1,20 @@
+Options -Indexes
+RewriteEngine On
+
+# Force HTTPS (Railway handles SSL via proxy, this handles the header)
+RewriteCond %{HTTP:X-Forwarded-Proto} =http
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Block direct access to sensitive files
+<FilesMatch "(config\.php|functions\.php|\.env|docker.*|railway\.toml)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Block sql directory
+RewriteRule ^sql/ - [F,L]
+
+# PHP settings
+php_value upload_max_filesize 10M
+php_value post_max_size 10M
+php_value max_execution_time 30
