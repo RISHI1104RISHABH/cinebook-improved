@@ -2,15 +2,17 @@
 # ─── CineBook docker entrypoint ──────────────────────────────────────────────
 set -e
 
+# Apache port — Railway injects PORT; capture it before overwriting with MySQL port
+APACHE_PORT="${PORT:-8080}"
+
 # Read DB vars — Railway MySQL plugin or manual overrides
 HOST="${MYSQLHOST:-${DB_HOST:-localhost}}"
 PORT="${MYSQLPORT:-${DB_PORT:-3306}}"
 USER="${MYSQLUSER:-${DB_USER:-root}}"
 PASS="${MYSQLPASSWORD:-${DB_PASS:-}}"
 DB="${MYSQLDATABASE:-${DB_NAME:-movie_booking}}"
-SITE_PORT="${PORT:-8080}"
 
-echo "🎬 CineBook starting on port $SITE_PORT..."
+echo "🎬 CineBook starting on port $APACHE_PORT..."
 echo "🗄  Database: $USER@$HOST:$PORT/$DB"
 
 # ─── Wait for MySQL ───────────────────────────────────────────────────────────
@@ -43,9 +45,9 @@ else
 fi
 
 # ─── Set Apache port ──────────────────────────────────────────────────────────
-echo "Listen $SITE_PORT" > /etc/apache2/ports.conf
-sed -i "s|\${PORT}|$SITE_PORT|g" /etc/apache2/sites-enabled/000-default.conf 2>/dev/null || true
-sed -i "s|<VirtualHost \*:[0-9]*>|<VirtualHost *:$SITE_PORT>|g" \
+echo "Listen $APACHE_PORT" > /etc/apache2/ports.conf
+sed -i "s|\${PORT}|$APACHE_PORT|g" /etc/apache2/sites-enabled/000-default.conf 2>/dev/null || true
+sed -i "s|<VirtualHost \*:[0-9]*>|<VirtualHost *:$APACHE_PORT>|g" \
     /etc/apache2/sites-enabled/000-default.conf 2>/dev/null || true
 
 echo "🚀 Starting Apache..."
