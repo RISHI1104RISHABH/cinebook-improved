@@ -1,6 +1,7 @@
 [build]
 builder = "DOCKERFILE"
 dockerfilePath = "cinebook/Dockerfile"
+rootDirectory = "cinebook"
 
 [deploy]
 restartPolicyType = "ON_FAILURE"
